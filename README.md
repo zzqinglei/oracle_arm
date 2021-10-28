@@ -5,7 +5,7 @@ oracle arm registration script. 乌龟壳刷ARM脚本
 
 简单,主机配置好oci，然后下载main.tf即可，不用自己获取各种参数。
 ## 运行环境配置
-本简单脚本使用python3编写，请自行配置好python3环境和requests库。（高版本的linux默认都自己带了,啥也不用装，可以要装一下git）
+本简单脚本使用python3编写，请自行配置好python3环境和requests库。（高版本的linux默认都自己带了,啥也不用装，可能要装一下git）
 
 比如检查本机的环境：
 
@@ -23,11 +23,11 @@ bash -c "$(curl –L https://raw.githubusercontent.com/oracle/oci-cli/master/scr
 
 ## 配置oci
 
-参考[大鸟博客](https://www.daniao.org/14035.html)中的 **3、复制租户和用户的ocid** 和 **4、配置cli** 配置好oci和公钥 
+参考文章[大鸟博客-Oracle甲骨文 ARM VPS（VM.Standard.A1.Flex）自动抢购脚本代码](https://www.daniao.org/14035.html)中的 **3、复制租户和用户的ocid** 和 **4、配置cli** 配置好oci和公钥 
 
 # 下载main.tf
 
-参考[大鸟博客-Oracle甲骨文 ARM VPS自动抢购脚本 – 利用宝塔面板+oci](https://www.daniao.org/14121.html) 中的 **1、生成main.tf** 即可，下载到本地并解压出main.tf文件
+参考文章[大鸟博客-Oracle甲骨文 ARM VPS自动抢购脚本 – 利用宝塔面板+oci](https://www.daniao.org/14121.html) 中的 **1、生成main.tf** 即可，下载到本地并解压出main.tf文件
 
 **注意**
 创建实例的时候网络哪里不要动，默认就好！！！
@@ -71,3 +71,6 @@ cd oracle_arm
 
 [大鸟博客](https://www.daniao.org/) 最先公布出刷arm方法，本脚本只是简化了一些步骤。
 
+# TODO
+
+- [ ] 无须配置oci即可刷
