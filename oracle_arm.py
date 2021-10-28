@@ -25,7 +25,7 @@ disp_name=""
 SHELL_FILENAME = "arm.sh"
 
 def telegram(desp):
-    data = (('chat_id', TG_USER_ID), ('text', '🏆ARM开通脚本🏆\n\n' + desp))
+    data = (('chat_id', TG_USER_ID), ('text', '🏆ARM开通脚本🏆 \n\n' + desp))
     response = requests.post('https://' + TG_API_HOST + '/bot' + TG_BOT_TOKEN +
                              '/sendMessage',
                              data=data)
