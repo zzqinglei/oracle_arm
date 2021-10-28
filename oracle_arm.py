@@ -15,13 +15,14 @@ TG_API_HOST = 'api.telegram.org'  # 自建 API 反代地址，供网络环境无
 # 硬盘大小设置
 HARDDRIVE_SIZE = 50
 
-SHELL_FILENAME = "arm.sh"
+
 
 # 一些不用动的地方
 domain = ""
 cpu_count = ""
 memory_size = ""
-
+disp_name=""
+SHELL_FILENAME = "arm.sh"
 
 def telegram(desp):
     data = (('chat_id', TG_USER_ID), ('text', '🏆ARM开通脚本🏆\n\n' + desp))
@@ -38,7 +39,7 @@ def tf_parser(buf):
     global domain
     global cpu_count
     global memory_size
-
+    global disp_name
     ssh_rsa_pat = re.compile('"ssh_authorized_keys" = "(.*)"')
     ssh_rsa = ssh_rsa_pat.findall(buf).pop()
 
@@ -62,9 +63,9 @@ def tf_parser(buf):
     subnet = subnet_pat.findall(buf).pop()
 
     # 实例名称
-    # disname_pat = re.compile('display_name = "(.*)"')
-    # disname = disname_pat.findall(buf).pop()
-
+    disname_pat = re.compile('display_name = "(.*)"')
+    disname = disname_pat.findall(buf).pop()
+    disp_name = disname
     # 查找类型
     shape_pat = re.compile('shape = "(.*)"')
     shape = shape_pat.findall(buf).pop()
@@ -83,8 +84,8 @@ def tf_parser(buf):
     ssh = '{"ssh_authorized_keys":"%s"}' % ssh_rsa
     config = '{"ocpus":%s,"memory_in_gbs":%s}' % (
         cpu, memory,)
-    oci_cmd = '''oci compute instance launch --availability-domain {} --image-id {} --subnet-id {} --shape {} --assign-public-ip {} --metadata '{}' --compartment-id {} --shape-config '{}' --boot-volume-size-in-gbs {} '''.format(
-        ava_domain, imageid, subnet, shape, pubip, ssh, compoartment, config,HARDDRIVE_SIZE)
+    oci_cmd = '''oci compute instance launch --availability-domain {} --image-id {} --subnet-id {} --shape {} --assign-public-ip {} --metadata '{}' --compartment-id {} --shape-config '{}' --boot-volume-size-in-gbs {} --display-name {}'''.format(
+        ava_domain, imageid, subnet, shape, pubip, ssh, compoartment, config,HARDDRIVE_SIZE,disname)
 
     try:
         f = open(SHELL_FILENAME, "w+")
@@ -97,8 +98,8 @@ def tf_parser(buf):
 
 def start():
     if USE_TG:
-        telegram("🐔🐔{}:{}核:{}G 开刷! ".format(
-                        domain, cpu_count, memory_size))
+        telegram("🐔🐔区域{}:实例:{} ,{}核:{}G 开刷! ".format(
+                        domain,disp_name,cpu_count, memory_size))
     cmd = "bash arm.sh"
     count = 0
     while True:
@@ -109,8 +110,8 @@ def start():
         if 'LimitExceeded' in res:
             print(u"脚本配置失败或者已经成功创建机器")
             if USE_TG:
-                telegram("经过{}次注册后,{}:{}核:{}G🐔🐔 似乎注册成功,请上后台查看确认吧".format(
-                    count, domain, cpu_count, memory_size))
+                telegram("经过{}次尝试后,区域{}:实例:{},{}核:{}G🐔🐔 似乎注册成功,请上后台查看确认吧(本脚本已自动停止)".format(
+                    count, domain, disp_name,cpu_count, memory_size))
             break
         time.sleep(random.randint(10, 15))
 
