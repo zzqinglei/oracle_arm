@@ -39,10 +39,10 @@ bash -c "$(curl –L https://raw.githubusercontent.com/oracle/oci-cli/master/scr
 ```python
 USE_TG = False  # 如果启用tg推送 要设置为True
 TG_BOT_TOKEN = ''  # 通过 @BotFather 申请获得，示例：1077xxx4424:AAFjv0FcqxxxxxxgEMGfi22B4yh15R5uw
-TG_USER_ID = ''  # 用户、群组或频道 ID，示例：129xxx206
+TG_USER_ID = ''  # 用户、群组或频道 ID，示例：129xxx206 ,
 ```
 USE_TG=True
-其他的token和id自行配置自己的
+其他的token和id自行配置自己的,id可以点击这个[机器人](https://t.me/myidbot?start=botostore)获取
 
 ## 修改硬盘大小
 默认是50G，
