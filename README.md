@@ -74,8 +74,12 @@ ServiceError:
 最后运行
 
 `nohup python3 oracle_arm.py main.tf >> /dev/null 2>&1 &`
-如果想保存一个日子，可以运行下面这个命令运行
+
+如果想保存一个日志，可以运行下面这个命令运行:
+
 `nohup python3 oracle_arm.py main.tf  > .log 2>&1 &`
+
+
 会自动停止的,不用管了。Done and enjoy 🎉
 
 # 再次感谢
