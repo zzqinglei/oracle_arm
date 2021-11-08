@@ -218,7 +218,7 @@ class InsCreate:
             except oci.exceptions.ServiceError as e:
                 if e.status == 429 and e.code == 'TooManyRequests' and e.message == 'Too many requests for the user':
                     # 被限速了，改一下时间
-                    print("请求太快了，自动调整请求时间")
+                    print("请求太快了，自动调整请求时间ing...")
                     if self.sleep_time < 60:
                         self.sleep_time += 10
                 elif not (e.status == 500 and e.code == 'InternalError' and e.message == 'Out of host capacity.'):
@@ -228,10 +228,10 @@ class InsCreate:
                     raise e
                 else:
                     # 没有被限速，恢复减少的时间
-                    print("目前没有请求限速")
+                    print("目前没有请求限速,狂刷中....")
                     if self.sleep_time > 15:
                         self.sleep_time -= 10
-
+                print("本次返回值为:",e)
                 time.sleep(self.sleep_time)
             else:
                 #  开通成功 ，ins 就是返回的数据
