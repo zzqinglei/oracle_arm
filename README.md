@@ -9,8 +9,11 @@ oracle arm registration script. 乌龟壳刷ARM脚本
 简单,主机配置好oci config，然后下载main.tf即可，不用自己解析各种参数。
 
 **20211108更新,参考oci api，脚本全部重写**
+
 解决误报的问题.
-oci请求几乎无延迟.
+
+oci请求几乎无延迟(为了保险期间加了5s的间隔，会自动判断返回值动态调整).
+
 自动获取开机的**公网IP**，无需登陆后台即可ssh上🐔。
 
 ### TODO
@@ -54,7 +57,8 @@ TG_USER_ID = ''  # 用户、群组或频道 ID，示例：129xxx206 ,
 其他的token和id自行配置自己的,id可以点击这个[机器人](https://t.me/myidbot?start=botostore)获取
 
 开始推送和创建成功的推送demo:
-![](./images/sus.png)
+
+![推送](./images/sus.png)
 
 
 # 运行脚本
