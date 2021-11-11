@@ -45,7 +45,18 @@ bash -c "$(curl –L https://raw.githubusercontent.com/oracle/oci-cli/master/scr
 **注意**
 创建实例的时候网络哪里不要动，默认就好！！！
 
-然后公钥要提前下载好。
+然后密钥要提前下载好。
+
+**补充**
+很多老哥没有保存好密钥,不用担心，开机成功后按照下面的步骤设置密码即可
+
+![](./images/s4.png)
+```
+echo root:密码 |sudo chpasswd root
+sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config;
+sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config;
+sudo service sshd restart
+```
 
 # 脚本需要改的地方
 ## 启动 tg推送
@@ -63,6 +74,11 @@ TG_USER_ID = ''  # 用户、群组或频道 ID，示例：129xxx206 ,
 
 ![推送](./images/sus.png)
 
+成功的反馈
+
+![推送](./images/s1.png)
+![推送](./images/s2.png)
+![推送](./images/s3.png)
 
 # 运行脚本
 
