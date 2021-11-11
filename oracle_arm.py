@@ -5,7 +5,8 @@ from oci.core import ComputeClient, VirtualNetworkClient
 from oci.config import validate_config
 import sys
 import requests
-
+import random
+import base64
 # tg pusher config
 USE_TG = False  # 如果启用tg推送 要设置为True
 TG_BOT_TOKEN = ''  # 通过 @BotFather 申请获得，示例：1077xxx4424:AAFjv0FcqxxxxxxgEMGfi22B4yh15R5uw
@@ -36,7 +37,8 @@ class OciUser:
 
     def __init__(self, configfile="~/.oci/config", profile="DEFAULT"):
         # todo 用户可以自定义制定config文件地址，暂时懒得写
-        cfg = oci.config.from_file(file_location=configfile, profile_name=profile)
+        cfg = oci.config.from_file(file_location=configfile,
+                                   profile_name=profile)
         validate_config(cfg)
         self.parse(cfg)
 
@@ -103,9 +105,11 @@ class FileParser:
         imageid_pat = re.compile('source_id = "(.*)"')
         self.image_id = imageid_pat.findall(self._filebuf)[0]
         # 硬盘大小
-        oot_volume_size_in_gbs_pat = re.compile('boot_volume_size_in_gbs = "(.*)"')
+        oot_volume_size_in_gbs_pat = re.compile(
+            'boot_volume_size_in_gbs = "(.*)"')
         try:
-            self.boot_volume_size_in_gbs = float(oot_volume_size_in_gbs_pat.findall(self._filebuf).pop())
+            self.boot_volume_size_in_gbs = float(
+                oot_volume_size_in_gbs_pat.findall(self._filebuf).pop())
         except IndexError:
             self.boot_volume_size_in_gbs = 50.0
 
@@ -201,50 +205,62 @@ class InsCreate:
         self._client = ComputeClient(config=dict(user))
         self.tf = FileParser(filepath)
 
+    def gen_pwd(self):
+        passwd = ''.join(
+            random.sample(
+                'ZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqponmlkjihgfedcba#@1234567890',
+                13))
+        print("创建ssh登陆密码:{}\n".format(passwd))
+        self._pwd = passwd
+        sh = '#!/bin/bash \n    echo root:' + passwd + " | sudo chpasswd root\n    sudo sed -i 's/^.*PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config;\n    sudo sed -i 's/^.*PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config;\n    sudo reboot"
+        sh64 = base64.b64encode(sh.encode('utf-8'))
+        sh64 = str(sh64, 'utf-8')
+        self._slcmd = sh64
+
     def create(self):
         # print("与运行创建活动")
         # 开启一个tg的原始推送
         text = "脚本开始启动:\n,区域:{}-实例:{},CPU:{}C-内存:{}G-硬盘:{}G的小🐔已经快马加鞭抢购了\n".format(
-            self.tf.availability_domain,
-            self.tf.display_name,
-            self.tf.ocpus,
-            self.tf.memory_in_gbs,
-            self.tf.boot_volume_size_in_gbs)
+            self.tf.availability_domain, self.tf.display_name, self.tf.ocpus,
+            self.tf.memory_in_gbs, self.tf.boot_volume_size_in_gbs)
         telegram(text)
-
+        self.gen_pwd()
         while True:
             try:
                 ins = self.lunch_instance()  # 应该返回具体的成功的数据
             except oci.exceptions.ServiceError as e:
                 if e.status == 429 and e.code == 'TooManyRequests' and e.message == 'Too many requests for the user':
                     # 被限速了，改一下时间
-                    print("请求太快了，自动调整请求时间ing...")
+                    print("请求太快了，自动调整请求时间")
                     if self.sleep_time < 60:
                         self.sleep_time += 10
-                elif not (e.status == 500 and e.code == 'InternalError' and e.message == 'Out of host capacity.'):
+                elif not (e.status == 500 and e.code == 'InternalError'
+                          and e.message == 'Out of host capacity.'):
                     # 可能是别的错误，也有可能是 达到上限了，要去查看一下是否开通成功，也有可能错误了
                     self.logp("❌发生错误,脚本停止!请检查参数或github反馈/查找 相关问题:{}".format(e))
                     telegram(self.desp)
                     raise e
                 else:
                     # 没有被限速，恢复减少的时间
-                    print("目前没有请求限速,狂刷中....")
+                    print("目前没有请求限速")
                     if self.sleep_time > 15:
                         self.sleep_time -= 10
-                print("本次返回值为:",e)
+
                 time.sleep(self.sleep_time)
             else:
                 #  开通成功 ，ins 就是返回的数据
                 #  可以等一会去请求实例的ip
                 # print("开通成功之后的ins:\n\n", ins, type(ins))
-                self.logp("🎉经过 {} 尝试后\n 区域:{}实例:{}-CPU:{}C-内存:{}G🐔创建成功了🎉\n".format(
-                    self.try_count + 1,
-                    self.tf.availability_domain,
-                    self.tf.display_name,
-                    self.tf.ocpus,
-                    self.tf.memory_in_gbs,
-                ))
+                self.logp(
+                    "🎉经过 {} 尝试后\n 区域:{}实例:{}-CPU:{}C-内存:{}G🐔创建成功了🎉\n".format(
+                        self.try_count + 1,
+                        self.tf.availability_domain,
+                        self.tf.display_name,
+                        self.tf.ocpus,
+                        self.tf.memory_in_gbs,
+                    ))
                 self.ins_id = ins.id
+                self.logp("ssh登陆密码: {} \n".format(self._pwd))
                 self.check_public_ip()
 
                 telegram(self.desp)
@@ -255,11 +271,11 @@ class InsCreate:
 
     def check_public_ip(self):
 
-        network_client = VirtualNetworkClient(
-            config=dict(self._user))
+        network_client = VirtualNetworkClient(config=dict(self._user))
         while True:
-            attachments = self._client.list_vnic_attachments(compartment_id=self._user.compartment_id(),
-                                                             instance_id=self.ins_id)
+            attachments = self._client.list_vnic_attachments(
+                compartment_id=self._user.compartment_id(),
+                instance_id=self.ins_id)
             data = attachments.data
             if len(data) != 0:
                 print("开始查找vnic id ")
@@ -271,22 +287,25 @@ class InsCreate:
             time.sleep(5)
 
     def lunch_instance(self):
-        return self._client.launch_instance(oci.core.models.LaunchInstanceDetails(
-            display_name=self.tf.display_name,
-            compartment_id=self.tf.compoartment_id,
-            shape=self.shape,
-            shape_config=oci.core.models.LaunchInstanceShapeConfigDetails(ocpus=self.tf.ocpus,
-                                                                          memory_in_gbs=self.tf.memory_in_gbs),
-            availability_domain=self.tf.availability_domain,
-            create_vnic_details=oci.core.models.CreateVnicDetails(subnet_id=self.tf.subnet_id,
-                                                                  hostname_label=self.tf.display_name),
-            source_details=oci.core.models.InstanceSourceViaImageDetails(
-                image_id=self.tf.image_id,
-                boot_volume_size_in_gbs=self.tf.boot_volume_size_in_gbs,
-            ),
-            metadata=dict(ssh_authorized_keys=self.tf.ssh_authorized_keys),
-            is_pv_encryption_in_transit_enabled=True,
-        )).data
+        return self._client.launch_instance(
+            oci.core.models.LaunchInstanceDetails(
+                display_name=self.tf.display_name,
+                compartment_id=self.tf.compoartment_id,
+                shape=self.shape,
+                extended_metadata={'user_data': self._slcmd},
+                shape_config=oci.core.models.LaunchInstanceShapeConfigDetails(
+                    ocpus=self.tf.ocpus, memory_in_gbs=self.tf.memory_in_gbs),
+                availability_domain=self.tf.availability_domain,
+                create_vnic_details=oci.core.models.CreateVnicDetails(
+                    subnet_id=self.tf.subnet_id,
+                    hostname_label=self.tf.display_name),
+                source_details=oci.core.models.InstanceSourceViaImageDetails(
+                    image_id=self.tf.image_id,
+                    boot_volume_size_in_gbs=self.tf.boot_volume_size_in_gbs,
+                ),
+                metadata=dict(ssh_authorized_keys=self.tf.ssh_authorized_keys),
+                is_pv_encryption_in_transit_enabled=True,
+            )).data
 
     def logp(self, text):
         print(text)
