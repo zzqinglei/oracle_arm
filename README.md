@@ -6,7 +6,7 @@ oracle arm registration script. 乌龟壳刷ARM脚本
 
 # 本脚本优点
 
-简单,主机配置好oci config，然后下载main.tf即可，不用自己解析各种参数。
+简单,主机配置好oci config，然后下载main.tf即可，不用自己解析各种参数,自动设置ssh登陆密码。
 
 **20211108更新,参考oci api，脚本全部重写**
 
@@ -21,7 +21,7 @@ oci请求几乎无延迟(为了保险起见加了5s的间隔，会自动判断�
 - [ ] 无需下载公钥可刷
 - [ ] 无需配置tf可刷
 - [ ] 自动配置ipv6网络
-- [ ] 自动设置机器ssh密码
+- [x] 自动设置机器ssh密码
 
 # 配置oci
 
@@ -42,7 +42,7 @@ bash -c "$(curl –L https://raw.githubusercontent.com/oracle/oci-cli/master/scr
 
 参考文章[大鸟博客-Oracle甲骨文 ARM VPS自动抢购脚本 – 利用宝塔面板+oci](https://www.daniao.org/14121.html) 中的 步骤 **1、生成main.tf** 即可，下载到本地并解压出main.tf文件
 
-**注意**
+<!-- **注意**
 创建实例的时候网络哪里不要动，默认就好！！！
 
 然后密钥要提前下载好。
@@ -56,7 +56,7 @@ echo root:密码 |sudo chpasswd root
 sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config;
 sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config;
 sudo service sshd restart
-```
+``` -->
 
 # 脚本需要改的地方
 ## 启动 tg推送
@@ -72,7 +72,7 @@ TG_USER_ID = ''  # 用户、群组或频道 ID，示例：129xxx206 ,
 
 开始推送和创建成功的推送demo:
 
-![推送](./images/sus.png)
+![推送](./images/ceshi1.png)
 
 成功的反馈
 
