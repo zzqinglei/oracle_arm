@@ -74,11 +74,14 @@ TG_USER_ID = ''  # 用户、群组或频道 ID，示例：129xxx206 ,
 
 ![推送](./images/ceshi1.png)
 
-成功的反馈
+最新版本成功的反馈（刚出新加坡的时候）
+![推送](./images/sgp1.png)
+![推送](./images/sgp2.png)
 
+<!-- 下面是旧版本
 ![推送](./images/s1.png)
 ![推送](./images/s2.png)
-![推送](./images/s3.png)
+![推送](./images/s3.png) -->
 
 # 运行脚本
 
