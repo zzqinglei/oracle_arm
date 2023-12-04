@@ -8,7 +8,7 @@ oracle arm registration script. 乌龟壳刷ARM脚本
 
 简单,主机配置好oci config，然后下载main.tf即可，不用自己解析各种参数,自动设置ssh登陆密码。
 
-**20211108更新,参考oci api，脚本全部重写**
+**20231204更新,增加邮件通知功能**
 
 解决误报的问题.
 
@@ -69,6 +69,17 @@ TG_USER_ID = ''  # 用户、群组或频道 ID，示例：129xxx206 ,
 ```
 `USE_TG=True`
 其他的token和id自行配置自己的,id可以点击这个[机器人](https://t.me/myidbot?start=botostore)获取
+# SMTP服务器地址和端口号
+smtp_server = 'smtp.qq.com'
+smtp_port = 465
+# 发送方邮箱地址和密码
+sender_email = '12345@qq.com'
+sender_password = '16char-smtp certicode' #注意不是密码，是smtp用的授权码，不会就百度一下。
+# 收件人邮箱地址
+recipient_email = '12345@qq.com'
+# 邮件主题和正文
+mail_subject = '甲骨文抢到了'
+mail_content = '看日志'
 
 开始推送和创建成功的推送demo:
 
