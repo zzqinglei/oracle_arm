@@ -14,7 +14,7 @@ smtp_server = 'smtp.qq.com'
 smtp_port = 465
 # 发送方邮箱地址和密码
 sender_email = '12345@qq.com'
-sender_password = '16char-smtp certicode'
+sender_password = '16char-smtp certicode' #注意不是密码，是smtp用的授权码，不会就百度一下
 # 收件人邮箱地址
 recipient_email = '12345@qq.com'
 # 邮件主题和正文
